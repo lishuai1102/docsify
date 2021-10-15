@@ -5,6 +5,8 @@
 	* [Linux服务器安装Nginx](linux/installNginx)
 	* [Linux服务器安装Redis](linux/installRedis)
 	* [Linux服务器安装Fastdfs](linux/installFastdfs)
+* Java
+    * [Cloneable详解] (java/cloneable)
 * 常用应用网站
     * [angular相关](website/angular)
 

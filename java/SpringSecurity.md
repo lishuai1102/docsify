@@ -2,18 +2,20 @@
 
 Spring Security 应该属于 Spring 全家桶中学习曲线比较陡峭的几个模块之一，下面我将从起源和定义这两个方面来简单介绍一下它。
 
-- **起源：** Spring Security 实际上起源于 Acegi Security，这个框架能为基于 Spring 的企业应用提供强大而灵活安全访问控制解决方案，并且框架这个充分利用 Spring 的 IoC 和 AOP 功能，提供声明式安全访问控制的功能。后面，随着这个项目发展， Acegi Security 成为了Spring官方子项目，后来被命名为 “Spring Security”。
+- **起源：** Spring Security 实际上起源于 Acegi Security，这个框架能为基于 Spring 的企业应用提供强大而灵活安全访问控制解决方案，并且框架这个充分利用 Spring 的 IoC 和 AOP
+  功能，提供声明式安全访问控制的功能。后面，随着这个项目发展， Acegi Security 成为了Spring官方子项目，后来被命名为 “Spring Security”。
 - **定义：**Spring Security 是一个功能强大且高度可以定制的框架，侧重于为Java 应用程序提供身份验证和授权。——[官方介绍](https://spring.io/projects/spring-security)。
 
 ## Session 和 Token 认证对比
 
 ### Session 认证图解
 
-很多时候我们都是通过 SessionID 来实现特定的用户，SessionID 一般会选择存放在 Redis 中。举个例子：用户成功登陆系统，然后返回给客户端具有 SessionID 的 Cookie，当用户向后端发起请求的时候会把 SessionID 带上，这样后端就知道你的身份状态了。
+很多时候我们都是通过 SessionID 来实现特定的用户，SessionID 一般会选择存放在 Redis 中。举个例子：用户成功登陆系统，然后返回给客户端具有 SessionID 的 Cookie，当用户向后端发起请求的时候会把
+SessionID 带上，这样后端就知道你的身份状态了。
 
 关于这种认证方式更详细的过程如下：
 
-![Session Based Authentication flow](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-7/Session-Based-Authentication-flow.png)
+![Session Based Authentication flow](_media/Session-Based-Authentication-flow.png)
 
 1. 用户向服务器发送用户名和密码用于登陆系统。
 2. 服务器验证通过后，服务器为用户创建一个 Session，并将 Session信息存储 起来。
@@ -23,11 +25,13 @@ Spring Security 应该属于 Spring 全家桶中学习曲线比较陡峭的几�
 
 ### Token 认证图解
 
-在基于 Token 进行身份验证的的应用程序中，服务器通过`Payload`、`Header`和一个密钥(`secret`)创建令牌（`Token`）并将 `Token` 发送给客户端，客户端将 `Token` 保存在 Cookie 或者 localStorage 里面，以后客户端发出的所有请求都会携带这个令牌。你可以把它放在 Cookie 里面自动发送，但是这样不能跨域，所以更好的做法是放在 HTTP  Header 的 `Authorization`字段中：` Authorization: Bearer Token`。
+在基于 Token 进行身份验证的的应用程序中，服务器通过`Payload`、`Header`和一个密钥(`secret`)创建令牌（`Token`）并将 `Token` 发送给客户端，客户端将 `Token` 保存在 Cookie 或者
+localStorage 里面，以后客户端发出的所有请求都会携带这个令牌。你可以把它放在 Cookie 里面自动发送，但是这样不能跨域，所以更好的做法是放在 HTTP Header 的 `Authorization`
+字段中：` Authorization: Bearer Token`。
 
 关于这种认证方式更详细的过程如下：
 
-![Token Based Authentication flow](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-7/Token-Based-Authentication.png)
+![Token Based Authentication flow](_media/Token-Based-Authentication.png)
 
 1. 用户向服务器发送用户名和密码用于登陆系统。
 2. 身份验证服务响应并返回了签名的 JWT，上面包含了用户是谁的内容。
@@ -38,7 +42,8 @@ Spring Security 应该属于 Spring 全家桶中学习曲线比较陡峭的几�
 
 ### 配置类
 
-在本项目中我们自定义 `SecurityConfig` 继承了 `WebSecurityConfigurerAdapter`。 `WebSecurityConfigurerAdapter`提供`HttpSecurity`来配置 cors，csrf，会话管理和受保护资源的规则。
+在本项目中我们自定义 `SecurityConfig` 继承了 `WebSecurityConfigurerAdapter`。 `WebSecurityConfigurerAdapter`提供`HttpSecurity`来配置
+cors，csrf，会话管理和受保护资源的规则。
 
 配置类中我们主要配置了：
 
@@ -49,6 +54,7 @@ Spring Security 应该属于 Spring 全家桶中学习曲线比较陡峭的几�
 5. 将两个自定义处理权限认证方面的异常类添加到 Spring Security 配置中；
 
 ```java
+
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -108,6 +114,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 在这里踩的一个坑是:如果你没有设置`exposedHeaders("Authorization")`暴露 header 中的"Authorization"属性给客户端应用程序的话，前端是获取不到 token 信息的。
 
 ```java
+
 @Configuration
 public class CorsConfiguration implements WebMvcConfigurer {
 
@@ -184,19 +191,18 @@ public class JwtTokenUtils {
 }
 ```
 
-
-
-###  获取保存在服务端的用户信息类
+### 获取保存在服务端的用户信息类
 
 Spring Security 提供的 `UserDetailsService`有一个通过名字返回 Spring Security 可用于身份验证的`UserDetails`对象的方法：`loadUserByUsername()`。
 
 ```java
 package org.springframework.security.core.userdetails;
+
 /**
  *加载用户特定数据的核心接口。
  */
 public interface UserDetailsService {
-	UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 }
 ```
 
@@ -204,23 +210,31 @@ public interface UserDetailsService {
 
 ```java
 package org.springframework.security.core.userdetails;
+
 /**
  *提供用户核心信息的借口
  */
 public interface UserDetails extends Serializable {
-  Collection<? extends GrantedAuthority> getAuthorities();
-  String getPassword();
-  String getUsername();
-  boolean isAccountNonExpired();
-  boolean isAccountNonLocked();
-  boolean isCredentialsNonExpired();
-  boolean isEnabled();
+    Collection<? extends GrantedAuthority> getAuthorities();
+
+    String getPassword();
+
+    String getUsername();
+
+    boolean isAccountNonExpired();
+
+    boolean isAccountNonLocked();
+
+    boolean isCredentialsNonExpired();
+
+    boolean isEnabled();
 }
 ```
 
 一般情况下我们需要实现 `UserDetailsService` 借口并重写其中的 `loadUserByUsername()` 方法。
 
 ```java
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -229,6 +243,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetailsServiceImpl(UserService userService) {
         this.userService = userService;
     }
+
     @Override
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
         User user = userService.findUserByUserName(name);
@@ -242,7 +257,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 > 建议看下面的过滤器介绍之前先了解一下过滤器的基础知识，以及如何在 Spring Boot 中实现过滤器。推荐阅读这篇文章：[SpringBoot 实现过滤器](https://github.com/Snailclimb/springboot-guide/blob/master/docs/basis/springboot-filter.md)
 
-第一个过滤器主要`JWTAuthenticationFilter`用于根据用户的用户名和密码进行登录验证(用户请求中必须有用户名和密码这两个参数)，为此我们继承了 `UsernamePasswordAuthenticationFilter` 并且重写了下面三个方法：
+第一个过滤器主要`JWTAuthenticationFilter`用于根据用户的用户名和密码进行登录验证(用户请求中必须有用户名和密码这两个参数)，为此我们继承了 `UsernamePasswordAuthenticationFilter`
+并且重写了下面三个方法：
 
 1. `attemptAuthentication（）`: 验证用户身份。
 2. `successfulAuthentication()` ： 用户身份验证成功后调用的方法。
@@ -315,16 +331,19 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 这个过滤器中有几个比较重要的地方说明：
 
 1. `UsernamePasswordAuthenticationToken`:从登录请求中获取{用户名，密码}，`AuthenticationManager`将使用它来认证登录帐户。
-2. `authenticationManager.authenticate(authRequest)`:这段代码主要对用户进行认证，当执行这段代码的时候会跳到`UserDetailsServiceImpl`中去调用`loadUserByUsername()`方法来验证（我们在配置类中配置了`AuthenticationManager`使用自定义的`UserDetailsServiceImpl`去验证用户信息）。当验证成功后会返回一个完整填充的`Authentication`对象(包括授予的权限)，然后会去调用`successfulAuthentication`方法。
+2. `authenticationManager.authenticate(authRequest)`:这段代码主要对用户进行认证，当执行这段代码的时候会跳到`UserDetailsServiceImpl`
+   中去调用`loadUserByUsername()`方法来验证（我们在配置类中配置了`AuthenticationManager`使用自定义的`UserDetailsServiceImpl`
+   去验证用户信息）。当验证成功后会返回一个完整填充的`Authentication`对象(包括授予的权限)，然后会去调用`successfulAuthentication`方法。
 
 ```java
 package org.springframework.security.authentication;
- /**
-  *尝试验证Authentication对象，如果成功，将返回一个完整填充的Authentication对象(包括授予的权限)。
-  */
+
+/**
+ *尝试验证Authentication对象，如果成功，将返回一个完整填充的Authentication对象(包括授予的权限)。
+ */
 public interface AuthenticationManager {
-	Authentication authenticate(Authentication authentication)
-			throws AuthenticationException;
+    Authentication authenticate(Authentication authentication)
+            throws AuthenticationException;
 }
 ```
 
@@ -334,8 +353,10 @@ public interface AuthenticationManager {
 
 当用户使用 token 对需要权限才能访问的资源进行访问的时候，这个类是主要用到的，下面按照步骤来说一说每一步到底都做了什么。
 
-1. 当用户使用系统返回的 token 信息进行登录的时候 ，会首先经过`doFilterInternal（）`方法，这个方法会从请求的Header中取出 token 信息，然后判断 token 信息是否为空以及 token 信息格式是否正确。
-2. 如果请求头中有token 并且 token 的格式正确，则进行解析并判断 token 的有效性，然后会在 Spring  Security 全局设置授权信息`SecurityContextHolder.getContext().setAuthentication(getAuthentication(authorization));`
+1. 当用户使用系统返回的 token 信息进行登录的时候 ，会首先经过`doFilterInternal（）`方法，这个方法会从请求的Header中取出 token 信息，然后判断 token 信息是否为空以及 token
+   信息格式是否正确。
+2. 如果请求头中有token 并且 token 的格式正确，则进行解析并判断 token 的有效性，然后会在 Spring Security
+   全局设置授权信息`SecurityContextHolder.getContext().setAuthentication(getAuthentication(authorization));`
 
 ```java
 /**
@@ -390,7 +411,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
 ### 获取当前用户
 
-我们在讲过滤器的时候说过，当认证成功的用户访问系统的时候，它的认证信息会被设置在 Spring  Security 全局中。那么，既然这样，我们在其他地方获取到当前登录用户的授权信息也就很简单了，通过`SecurityContextHolder.getContext().getAuthentication();`方法即可。
+我们在讲过滤器的时候说过，当认证成功的用户访问系统的时候，它的认证信息会被设置在 Spring Security
+全局中。那么，既然这样，我们在其他地方获取到当前登录用户的授权信息也就很简单了，通过`SecurityContextHolder.getContext().getAuthentication();`方法即可。
 
 `SecurityContextHolder` 保存 `SecurityContext` 的信息，`SecurityContext `保存已通过认证的 `Authentication` 认证信息。
 
@@ -480,7 +502,8 @@ public class JWTAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
 这个是 `UserControler` 主要用来检测权限配置是否生效。
 
-`getAllUser（）`方法被注解` @PreAuthorize("hasAnyRole('ROLE_DEV','ROLE_PM')")`修饰代表这个方法可以被DEV，PM 这两个角色访问，而`deleteUserById()` 被注解` @PreAuthorize("hasAnyRole('ROLE_ADMIN')")`修饰代表只能被 ADMIN 访问。
+`getAllUser（）`方法被注解` @PreAuthorize("hasAnyRole('ROLE_DEV','ROLE_PM')")`修饰代表这个方法可以被DEV，PM 这两个角色访问，而`deleteUserById()`
+被注解` @PreAuthorize("hasAnyRole('ROLE_ADMIN')")`修饰代表只能被 ADMIN 访问。
 
 ```java
 /**

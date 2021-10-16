@@ -15,7 +15,7 @@ SessionID 带上，这样后端就知道你的身份状态了。
 
 关于这种认证方式更详细的过程如下：
 
-![Session Based Authentication flow](./_media/Session-Based-Authentication-flow.png)
+![Session Based Authentication flow](../_media/Session-Based-Authentication-flow.png)
 
 1. 用户向服务器发送用户名和密码用于登陆系统。
 2. 服务器验证通过后，服务器为用户创建一个 Session，并将 Session信息存储 起来。
@@ -31,7 +31,7 @@ localStorage 里面，以后客户端发出的所有请求都会携带这个令�
 
 关于这种认证方式更详细的过程如下：
 
-![Token Based Authentication flow](./_media/Token-Based-Authentication.png)
+![Token Based Authentication flow](../_media/Token-Based-Authentication.png)
 
 1. 用户向服务器发送用户名和密码用于登陆系统。
 2. 身份验证服务响应并返回了签名的 JWT，上面包含了用户是谁的内容。

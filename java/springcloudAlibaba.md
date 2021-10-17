@@ -6502,23 +6502,20 @@ subscribed-services: service-product # 订阅的提供者名称
 @RestController
 @Slf4j
 public class OrderController {
-```
-```
+
 @Autowired
 private OrderService orderService;
-```
-```
+
 //引用服务
 @Reference
 private ProductService productService;
-```
-```
+
 @RequestMapping("/order/prod/{pid}")
 public Order order(@PathVariable Integer pid) {
 log.info("接收到{}号商品的下单请求,接下来调用商品微服务查询此商品信息", pid);
-```
-```
+
 //调用商品微服务,查询商品信息
+}
 ```
 
 ##### 4 服务调用测试
@@ -6526,8 +6523,6 @@ log.info("接收到{}号商品的下单请求,接下来调用商品微服务查�
 ```
 Product product = productService.findByPid(pid);
 log.info("查询到{}号商品的信息,内容是:{}", pid, JSON.toJSONString(product));
-```
-```
 //下单(创建订单)
 Order order = new Order();
 order.setUid(1);
@@ -6538,8 +6533,6 @@ order.setPprice(product.getPprice());
 order.setNumber(1);
 orderService.createOrder(order);
 log.info("创建订单成功,订单信息为{}", JSON.toJSONString(order));
-```
-```
 return order;
 }
 }
